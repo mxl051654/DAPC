@@ -18,42 +18,9 @@
 - 支持对不同压缩方法/压缩率/压缩模型规模进行横向比较，辅助研究分析
 
 ## 环境依赖
-
-建议环境：
-- Python 3.9+
-- 一块支持 CUDA 的 GPU（用于加载 Qwen2.5 等大模型）
-
-主要 Python 依赖（完整列表见 `requirements.txt`）：
-- torch
-- transformers (推荐版本 4.38.2 左右)
-- datasets
-- numpy, pandas
-- matplotlib, seaborn
-- tqdm
-- fuzzywuzzy 等用于文本相似度计算的工具
-- 本仓库中自带的 `longbench/llmlingua` 作为本地 LLMLingua 实现
-
-安装示例：
-
 ```bash
 pip install -r requirements.txt
 ```
-
-## 数据准备
-
-`longbench/consts.py` 中默认的数据根目录为：
-
-```python
-data_dir = "/data/hf"
-```
-
-请确保：
-- LongBench 数据集放在类似 `data_dir/THUDM/LongBench` 的目录结构下
-- InfiniteBench 等其他数据集路径与 `consts.py` 中的默认配置保持一致
-
-如果你的数据目录不同，可以：
-- 直接修改 `consts.py` 中的 `data_dir`，或者
-- 在自行调用数据加载逻辑时保持相同的数据组织方式
 
 ## 压缩脚本：`longbench/compress.py`
 
@@ -96,15 +63,8 @@ python longbench/compress.py \
 
 脚本会自动跳过已压缩且包含评分信息的数据，并对缺失或损坏的文件进行清理。
 
-### 合成压缩分数：`synthetic_compress`
 
-`compress.py` 中额外提供了 `synthetic_compress` 函数，用于将不同方法的 token 重要性分数按权重线性融合，得到“合成”压缩器。例如：
-- 将 `p-contrast-qa` 与 `lrp-qa` 的分数按照设定的 `alpha` 加权求和
-- 重新分块后写出新的 JSONL 结果，方法名中会包含权重组合信息
-
-这对于研究“多种压缩策略组合效果”非常有用。
-
-## 评测脚本：`longbench/eval.py`
+## 评测脚本：`eval.py`
 
 评测脚本负责读取推理结果 JSONL 文件，对不同任务进行打分，并按任务类别和整体平均分进行汇总，可选择导出为详细和摘要版 Excel 表。
 
@@ -119,7 +79,7 @@ python longbench/compress.py \
 你可以直接运行：
 
 ```bash
-python longbench/eval.py
+python eval.py
 ```
 
 在脚本末尾的 `if __name__ == "__main__":` 部分，可以修改：
@@ -134,9 +94,9 @@ python longbench/eval.py
 
 图像会保存到 `exp_pics/` 目录下，支持论文绘图级别的精度和美观度设置。
 
-## 压缩器实现：`longbench/llmlingua/`
+## 压缩器实现：`llmlingua/`
 
-`longbench/llmlingua` 目录包含了针对不同压缩策略的统一接口封装，入口为：
+`llmlingua` 目录包含了针对不同压缩策略的统一接口封装，入口为：
 
 - `llmlingua/__init__.py`：导出 `PromptCompressor`、`DACPromptCompressor`、`EHPCPromptCompressor`、`LRPPromptCompressor` 等
 - `llmlingua/llmlingua.py`：LLMLingua 基础实现
@@ -159,12 +119,15 @@ python longbench/eval.py
 
 ```text
 .
-├── longbench/
-│   ├── compress.py           # 提示压缩主脚本
-│   ├── eval.py               # 评测与可视化脚本
-│   ├── consts.py             # 数据集列表、prompt 模板、长度配置等
-│   ├── metrics.py            # 不同任务的评测指标实现
-│   └── llmlingua/            # 各类压缩方法的统一封装与实现
+├── llmlingua/
+│   ├── llmlingua.py           # 提示压缩主脚本
+│   ├── dac.py               # 评测与可视化脚本
+│   ├── ehpc.py             # 数据集列表、prompt 模板、长度配置等
+│   └── lrp.py            # 不同任务的评测指标实现
+├── requirements.txt
+├── requirements.txt
+├── requirements.txt
+├── requirements.txt
 ├── requirements.txt
 └── README.md
 ```
