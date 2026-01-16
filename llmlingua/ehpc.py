@@ -213,7 +213,7 @@ class EHPCPromptCompressor:
                             evidence_sum[l, h] += score.detach().cpu()
 
                     del outputs, attentions
-        # TODO  可视化分析
+        
         layer_scores, _ = torch.max(evidence_sum, dim=1)
         best_layer = int(torch.argmax(layer_scores).item())
         k = min(8, evidence_sum.size(1))
@@ -633,12 +633,9 @@ class EHPCPromptCompressor:
                     torch.mean(m_attentions[0, :, chunk_size:-pos_suffix_size, :chunk_size], dim=0),
                     dim=0).detach().cpu()
 
-                # NOTE  存在负值
                 score = last_layer_pos_attn - contrast_alpha * last_layer_neg_attn
                 score = (score - torch.min(score)) / (torch.max(score) - torch.min(score))
-                # score = torch.ones_like(score).to(score.device)
 
-                # TODO view scores
                 if rollout_m > 0:
                     for li in range(rollout_m - 1, -1, -1):  # [0, ..., m-1] [m, ..., n-1]
                         current_layer_attention = torch.mean(attentions[li][0, :, :chunk_size, :chunk_size],
@@ -997,10 +994,7 @@ def Pure_Contrast_Ablation(chunk, query, compressor):
 
 
 if __name__ == '__main__':
-    # Run analysis
-    # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    # analysis_main()
-
+    
     model_list = [
         '/data/hf/Qwen/Qwen2.5-7B-Instruct',
         # '/data/hf/Qwen/Qwen2.5-32B-Instruct',
