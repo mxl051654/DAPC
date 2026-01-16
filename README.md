@@ -120,14 +120,18 @@ python eval.py
 ```text
 .
 ├── llmlingua/
-│   ├── llmlingua.py           # 提示压缩主脚本
-│   ├── dac.py               # 评测与可视化脚本
-│   ├── ehpc.py             # 数据集列表、prompt 模板、长度配置等
-│   └── lrp.py            # 不同任务的评测指标实现
-├── requirements.txt
-├── requirements.txt
-├── requirements.txt
-├── requirements.txt
+│   ├── llmlingua.py   # llmlingua, llmlingua-2, longllmlingua
+│   ├── dac.py         # attn, ppl, dac
+│   ├── ehpc.py        # dapc, ehpc, kvzip
+│   └── lrp.py         # lrp, rollout
+├── consts.py
+├── compress.py
+├── compress.sh        # compress script
+├── model_openai.py    # vllm wrapper
+├── pred_vllm.py  
+├── run.sh             # inference script
+├── metrics.py
+├── eval.py            # eval results
 ├── requirements.txt
 └── README.md
 ```
