@@ -1,5 +1,4 @@
 #!/bin/bash
-#sudo renice -5 -p $$
 
 models=(
 #    '/data/hf/Qwen/Qwen2.5-0.5B-Instruct'
@@ -30,11 +29,11 @@ methods=(
 #    'llmlingua'
 #    'longllmlingua'
 #
-#    'attn'  # last token attn only
-#    'ppl'  # ppl only
-#    'dac'  # attn + ppl
+#    'attn'  
+#    'ppl'  
+#    'dac' 
 #    'attn-qa'
-#    'ehpc'  # select heads
+#    'ehpc' 
 #    'kvzip'
 
 #    'p-contrast'
@@ -44,17 +43,6 @@ methods=(
 #    'contrast-rollout-qa'
 #    'rollout-contrast-qa'
 #    'lrp-qa'
-
-#    'add-lrp-qa-0.5-p-contrast-qa-0.1'
-#    'add-lrp-qa-0.5-p-contrast-qa-0.2'
-#    'add-lrp-qa-0.5-p-contrast-qa-0.3'
-#    'add-lrp-qa-0.5-p-contrast-qa-0.4'
-#    'add-lrp-qa-0.5-p-contrast-qa-0.5'
-#    'add-lrp-qa-0.5-p-contrast-qa-0.6'
-#    'add-lrp-qa-0.5-p-contrast-qa-0.7'
-#    'add-lrp-qa-0.5-p-contrast-qa-0.8'
-#    'add-lrp-qa-0.5-p-contrast-qa-0.9'
-#    'add-lrp-qa-0.5-p-contrast-qa-1.0'
 )
 
 targets=(
@@ -81,13 +69,12 @@ datasets_longbench=(
 #     'passage_count' 'passage_retrieval_en'  # 'Synthetic'
 #     'repobench-p' 'lcc'  #  'Code'
 )
-
 benches=(
   'longbench'
 #  'longbench-e'
 #  'infinitebench'
 )
-PORT=8002
+PORT=  # port of vllm server
 
 for bench in "${benches[@]}"; do
     if [ "$bench" = "longbench-e" ]; then
