@@ -1,11 +1,11 @@
-# Prompt Compression on LongBench
+# DAPC: Efficient Prompt Compression with Debiased Attention for Long-Context Transformer Inference
 
 长上下文带来的推理和记忆成本，是当前大模型在真实应用中面临的关键瓶颈之一。本仓库基于 LLMLingua 系列方法，对 LongBench / LongBench-E / InfiniteBench 等基准数据集上的提示词进行压缩，并提供了完整的压缩与评测脚本，方便复现与扩展。
 
 核心脚本包括：
-- `longbench/compress.py`：对基准数据集进行提示压缩，生成压缩后的 JSONL 文件
-- `longbench/eval.py`：读取模型预测结果，对 LongBench 系列任务进行统一评测与可视化
-- `longbench/llmlingua/`：基于 LLMLingua 的多种压缩器实现与封装
+- `compress.py`：对基准数据集进行提示压缩，生成压缩后的 JSONL 文件
+- `eval.py`：读取模型预测结果，对 LongBench 系列任务进行统一评测与可视化
+- `llmlingua/`：基于 LLMLingua 的多种压缩器实现与封装
 
 如果你在研究或工程中关注长上下文推理效率、本地部署和压缩方案对性能的影响，本项目可以作为一个开箱即用、易于改造的基线系统。
 
