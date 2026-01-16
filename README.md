@@ -1,5 +1,9 @@
 # DAPC: Efficient Prompt Compression with Debiased Attention for Long-Context Transformer Inference
 
+## Language
+- [English](#English Version)
+- [中文](#中文说明)
+
 ## English Version
 
 ### Overview
