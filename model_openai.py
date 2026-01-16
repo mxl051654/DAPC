@@ -28,10 +28,8 @@ class OpenAI_Model:
             self.API_KEY = ''
             self.BASE_URL = ''
         elif model == 'deepseek-chat':
-
-            self.API_KEY = 'sk-31f42cabd232499bbb43b84d34d1687c'
+            self.API_KEY = ''
             self.BASE_URL = 'https://api.deepseek.com'
-            # self.BASE_URL = 'https://api.deepseek.com/v1'
         else:
             self.API_KEY = api_key
             self.BASE_URL = base_url
@@ -152,22 +150,6 @@ class OpenAI_Model:
         return response
 
 
-def meta(model='deepseek-chat', messages=None):
-
-    API_KEY = 'sk-31f42cabd232499bbb43b84d34d1687c'
-    BASE_URL = 'https://api.deepseek.com'
-    # BASE_URL = 'https://api.deepseek.com/v1'
-
-    client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
-
-    response = client.chat.completions.create(
-        model=model, messages=messages, timeout=120,
-        max_completion_tokens=4096,
-        temperature=1.0,
-    )
-    return response
-
-
 if __name__ == "__main__":
     messages = [
         {"role": "user", "content": "Humor is a way to make people laugh."
@@ -189,7 +171,4 @@ if __name__ == "__main__":
     response = llm.generate_json(
         messages,
         temperature=0.5, return_metadata=True, max_tokens=4096)['message']
-
-    # response = meta(model='deepseek-chat', messages=messages)
-
     print(response)
