@@ -28,7 +28,50 @@ Recommended environment:
 pip install -r requirements.txt
 ```
 
-### Compression Script: `longbench/compress.py`
+### Project Structure
+
+```text
+.
+├── llmlingua/
+│   ├── llmlingua.py   # llmlingua, llmlingua-2, longllmlingua
+│   ├── dac.py         # attn, ppl, dac
+│   ├── ehpc.py        # dapc, ehpc, kvzip
+│   └── lrp.py         # lrp, rollout
+├── consts.py
+├── compress.py
+├── compress.sh        # compress script
+├── model_openai.py    # vllm wrapper
+├── pred_vllm.py  
+├── run.sh             # inference script
+├── metrics.py
+├── eval.py            # eval results
+├── requirements.txt
+└── README.md
+```
+
+### Compressor Implementations: `llmlingua/`
+
+The `longbench/llmlingua` directory contains unified wrappers around different compression strategies. Main entry points include:
+
+- `llmlingua/__init__.py`: exports `PromptCompressor`, `DACPromptCompressor`, `EHPCPromptCompressor`, `LRPPromptCompressor`, etc.
+- `llmlingua/llmlingua.py`: core LLMLingua implementation
+- `llmlingua/dac.py`, `llmlingua/ehpc.py`, `llmlingua/lrp.py`, etc.: specific compressor implementations
+
+In `longbench/compress.py`, `CompressorFactory` maps method names to concrete compressor classes:
+- `llmlingua`, `llmlingua-2`, `longllmlingua` → `PromptCompressor`
+- `dac`, `attn`, `ppl` → `DACPromptCompressor`
+- `ehpc`, `kvzip`, `p-contrast-qa`, `rollout-qa` → `EHPCPromptCompressor`
+- `lrp-qa` → `LRPPromptCompressor`
+
+To add a new compression method:
+1. Implement a compressor class in `llmlingua/`
+2. Export it in `__init__.py`
+3. Register the method name in `CompressorFactory`
+
+The new method will then plug into the existing data-processing and evaluation pipeline naturally.
+
+
+### Compression Script: `compress.py`
 
 This script performs prompt compression for the specified benchmark dataset and saves results as JSONL files. The main entry point is `run_compress`.
 
@@ -56,7 +99,7 @@ Outputs are saved to:
 Example: compress `narrativeqa` on LongBench with KVzip-PC:
 
 ```bash
-python longbench/compress.py \
+python compress.py \
   --method kvzip \
   --model /data/hf/Qwen/Qwen2.5-7B-Instruct \
   --bench longbench \
@@ -69,9 +112,7 @@ python longbench/compress.py \
 
 The script automatically skips already-compressed files that contain scores, and cleans up missing or corrupted files.
 
-
-
-### Evaluation Script: `longbench/eval.py`
+### Evaluation Script: `eval.py`
 
 The evaluation script reads JSONL prediction files, scores each task, aggregates by task category and overall, and can optionally export both detailed and summary Excel reports.
 
@@ -86,7 +127,7 @@ Evaluation workflow:
 You can simply run:
 
 ```bash
-python longbench/eval.py
+python eval.py
 ```
 
 At the end of the script in the `if __name__ == "__main__":` block, you can modify:
@@ -100,48 +141,6 @@ The script also exposes several visualization utilities:
 - `view_pred`: quickly inspect raw predictions for a given experiment configuration
 
 Figures are saved under `exp_pics/` and can be used directly for publication-quality plots.
-
-### Compressor Implementations: `longbench/llmlingua/`
-
-The `longbench/llmlingua` directory contains unified wrappers around different compression strategies. Main entry points include:
-
-- `llmlingua/__init__.py`: exports `PromptCompressor`, `DACPromptCompressor`, `EHPCPromptCompressor`, `LRPPromptCompressor`, etc.
-- `llmlingua/llmlingua.py`: core LLMLingua implementation
-- `llmlingua/dac.py`, `llmlingua/ehpc.py`, `llmlingua/lrp.py`, etc.: specific compressor implementations
-
-In `longbench/compress.py`, `CompressorFactory` maps method names to concrete compressor classes:
-- `llmlingua`, `llmlingua-2`, `longllmlingua` → `PromptCompressor`
-- `dac`, `attn`, `ppl` → `DACPromptCompressor`
-- `ehpc`, `kvzip`, `p-contrast-qa`, `rollout-qa` → `EHPCPromptCompressor`
-- `lrp-qa` → `LRPPromptCompressor`
-
-To add a new compression method:
-1. Implement a compressor class in `llmlingua/`
-2. Export it in `__init__.py`
-3. Register the method name in `CompressorFactory`
-
-The new method will then plug into the existing data-processing and evaluation pipeline naturally.
-
-### Project Structure
-
-```text
-.
-├── llmlingua/
-│   ├── llmlingua.py   # llmlingua, llmlingua-2, longllmlingua
-│   ├── dac.py         # attn, ppl, dac
-│   ├── ehpc.py        # dapc, ehpc, kvzip
-│   └── lrp.py         # lrp, rollout
-├── consts.py
-├── compress.py
-├── compress.sh        # compress script
-├── model_openai.py    # vllm wrapper
-├── pred_vllm.py  
-├── run.sh             # inference script
-├── metrics.py
-├── eval.py            # eval results
-├── requirements.txt
-└── README.md
-```
 
 
 ### Usage and Extensions
