@@ -30,10 +30,9 @@ def read_jsonlines(path, column=None):
                 if column is not None:
                     data.append(json.loads(line)[column])
                 else:
-                    data.append(json.loads(line))  # 每一行都是一个 JSON 字符串
+                    data.append(json.loads(line))
             except Exception as e:
-                pass
-                # print(f"Json parse error: {e}")
+                print(f"Json parse error: {e}")
     return data
 
 
@@ -95,8 +94,6 @@ class BudgetAllocator:
                 compressed_list = []
                 shift = 0
                 for chunk_score in scores:
-
-                    # 计算每个chunk需要保留的 token数量
                     chunk_len = len(chunk_score)
                     if self.compress_ratio is not None:
                         k = int(chunk_len * self.compress_ratio)
@@ -106,7 +103,6 @@ class BudgetAllocator:
                     else:
                         k = chunk_len
 
-                    # TODO 基于分数，筛选 token
                     chunk_tokens = tokens[shift: shift + chunk_len]
 
                     if k < chunk_len:
@@ -123,7 +119,6 @@ class BudgetAllocator:
 
             elif self.budget_policy == 'global':
 
-                # 直接拼接分数，然后筛选
                 flat_scores = []
                 for chunk in scores:
                     flat_scores.extend(chunk)
@@ -220,7 +215,6 @@ def main():
             os.makedirs(out_dir)
         out_path = f"{out_dir}/{dataset}.jsonl"
 
-        # NOTE 加载已经处理好的记录
         finished_ids = []
         # if args.rerun and os.path.exists(out_path):
         #     os.remove(out_path)
@@ -229,7 +223,6 @@ def main():
             finished_ids = read_jsonlines(out_path, IDNAME[args.bench])
         print(f"Have processed {len(finished_ids)} @ {out_path}")
 
-        # NOTE 构建数据
         if args.method in ['original', 'zero-shot']:
             pass
         elif 'llmlingua' in args.method:
@@ -247,7 +240,7 @@ def main():
                 json_obj["context"] = json_obj["compressed_prompt"]  # NOTE !!!
             if json_obj[IDNAME[args.bench]] in finished_ids:
                 continue
-            # NOTE 裁剪上下文
+            
             tokenized_prompt = tokenizer(json_obj["context"], truncation=False, return_tensors="pt").input_ids[0]
             while len(tokenized_prompt) > MAX_LENGTH:
                 half = int(0.9 * MAX_LENGTH)
@@ -258,21 +251,20 @@ def main():
             message = [{'role': 'user', 'content': prompt}]
             todos.append((json_obj, message))
 
-        # NOTE 并发执行模型预测请求
+       
         print(f"TODO num : {len(todos)}")
         result_queue = queue.Queue()
         writer = threading.Thread(target=file_writer, args=(result_queue, out_path))
         writer.start()
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-            # 提交任务并等待执行完成
             futures = [executor.submit(process_request, args, json_obj, message, llm, result_queue)
                        for json_obj, message in todos]
-            # 使用 tqdm 显示任务进度
             for future in tqdm(concurrent.futures.as_completed(futures), total=len(futures)):
-                future.result()  # 获取返回值，若有异常会抛出
+                future.result() 
         result_queue.put(None)
         writer.join()
 
 
 if __name__ == '__main__':
     main()
+
