@@ -61,7 +61,6 @@ class CompressorFactory:
                 init_kwargs["model_name"] = "/data/hf/NousResearch/Llama-2-7b-hf"
                 # model_name="/data/hf/microsoft/phi-2"
                 # model_name="TheBloke/Llama-2-7b-Chat-GPTQ"
-                # model_config={"revision": "main"})
             elif method == 'llmlingua-2':
                 init_kwargs["model_name"] = "/data/hf/microsoft/llmlingua-2-xlm-roberta-large-meetingbank"
                 # model_name="/data/hf/microsoft/llmlingua-2-bert-base-multilingual-cased-meetingbank"
@@ -80,19 +79,14 @@ class CompressorFactory:
 
         elif method in [
             "attn-qa",
-
             "ehpc",
             "kvzip"
             'p-contrast',
             'p-contrast-qa',
             'rollout',
             'rollout-qa',
-
             'contrast-rollout-qa',
             'rollout-contrast-qa',
-
-            'kvzip',
-            'kvzip-aug'
         ]:
             self.compressor = EHPCPromptCompressor(model_name=args.model)
 
@@ -104,7 +98,6 @@ class CompressorFactory:
             print(f"No implementation for method {method}")
 
     def __str__(self) -> str:
-        # 示例：llmlingua_r0.60 或 llmlingua-2_t1024 或 longllmlingua_r0.55
         if self.target_token is not None:
             return f"{self.method}_t{self.target_token}"
         else:
@@ -118,17 +111,12 @@ class CompressorFactory:
             **kwargs: Any,
     ) -> Dict[str, Any]:
         """
-        NOTE 关于超长文本
-        处理超长文本的差异总结
-        
         query-agnostic
         - LLMLingua ：不切块，直接对整串文本做“迭代窗口 + KV-Cache”压缩，适合因果 LM，能在超长场景下流式推进。
         - LLMLingua-2 ：必须切块（编码器 512 限制），在块内做词级分类压缩，并可先做块/段的上下文级筛选，天然适合极长输入的分段处理与加速。
-        
         query-aware
         - LongLLMLingua ：先粗筛与重排（上下文/句子），大幅缩短需要细压的范围，再用 LLMLingua 的迭代窗口做细压，专门解决长上下文的相关性与位置信息问题。
         """
-        # 计算压缩控制参数（压缩率或目标 token 二选一）
         call_kwargs: Dict[str, Any] = dict(kwargs)
         if self.compress_rate is not None:
             call_kwargs["rate"] = self.compress_rate  # 压缩率
@@ -138,7 +126,6 @@ class CompressorFactory:
             call_kwargs.setdefault("rate", 0.5)
 
         if self.method == "llmlingua":
-            # 传统 LLMLingua 压缩
             return self.compressor.compress_prompt(
                 instruction=instruction,  # 指令
                 context=context,  # 上下文
@@ -146,8 +133,6 @@ class CompressorFactory:
                 **call_kwargs,  # 其他参数（如 iterative_size, context_budget 等）
             )
         elif self.method == "llmlingua-2":
-            # LLMLingua-2 压缩（支持 token-level 标签返回等）
-            # 常用参数示例：force_tokens, chunk_end_tokens, return_word_label, drop_consecutive
             return self.compressor.compress_prompt(
                 instruction=instruction,
                 context=context,
@@ -158,7 +143,6 @@ class CompressorFactory:
             """
             Task(Question)-Aware Compression, 需要提供question
             """
-            # LongLLMLingua 特有参数（提供默认值，可通过 kwargs 覆盖）
             call_kwargs.setdefault("use_sentence_level_filter", False)
             call_kwargs.setdefault("condition_in_question", "after_condition")
             call_kwargs.setdefault("reorder_context", "sort")
@@ -177,7 +161,6 @@ class CompressorFactory:
             'attn',
             'ppl'
         ]:
-            # NOTE 混合注意力和 ppl 分数
             return self.compressor.compress(
                 context=context,
                 compress_ratio=self.compress_rate,
@@ -192,14 +175,12 @@ class CompressorFactory:
 
         elif self.method in [
             'attn-qa',
-
-            "ehpc",  # head selection
+            "ehpc", 
             "kvzip",
-            'p-contrast',  # 重构提示
-            'p-contrast-qa',  # query 作为正提示
+            'p-contrast', 
+            'p-contrast-qa', 
             'rollout',
-            'rollout-qa',  # attention-rollout
-
+            'rollout-qa', 
             'contrast-rollout-qa',
             'rollout-contrast-qa',
         ]:
@@ -227,10 +208,6 @@ class CompressorFactory:
                 preserve_punct=False,
                 return_info=True
             )
-        elif self.method == 'disco_zip':
-            # Query agnostic 基于 DiscoGP 和复现/摘要任务的 关键头识别
-            # Query-aware 基于 DiscoGP 和 特定任务数据的 关键头识别
-            pass
         else:
             raise NotImplementedError(f"未知的压缩方法: {self.method}")
 
@@ -443,11 +420,3 @@ def synthetic_compress(
 
 if __name__ == '__main__':
     run_compress()
-
-    # for alpha in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]:
-    #     synthetic_compress(
-    #         bench='longbench',
-    #         dataset='narrativeqa',
-    #         methods=['lrp-qa', 'p-contrast-qa'],
-    #         alphas=[0.5, alpha]
-    #     )
