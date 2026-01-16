@@ -161,15 +161,23 @@ python longbench/eval.py
 
 ```text
 .
-├── longbench/
-│   ├── compress.py           # 提示压缩主脚本
-│   ├── eval.py               # 评测与可视化脚本
-│   ├── consts.py             # 数据集列表、prompt 模板、长度配置等
-│   ├── metrics.py            # 不同任务的评测指标实现
-│   └── llmlingua/            # 各类压缩方法的统一封装与实现
+├── llmlingua/
+│   ├── llmlingua.py   # llmlingua, llmlingua-2, longllmlingua
+│   ├── dac.py         # attn, ppl, dac
+│   ├── ehpc.py        # dapc, ehpc, kvzip
+│   └── lrp.py         # lrp, rollout
+├── consts.py
+├── compress.py
+├── compress.sh        # compress script
+├── model_openai.py    # vllm wrapper
+├── pred_vllm.py  
+├── run.sh             # inference script
+├── metrics.py
+├── eval.py            # eval results
 ├── requirements.txt
 └── README.md
 ```
+
 
 ### 使用建议与扩展方向
 
