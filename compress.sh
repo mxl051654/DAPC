@@ -1,6 +1,6 @@
 
 datasets_longbench=(
-#     'narrativeqa' 'qasper' 'multifieldqa_en' # Single-Document QA':
+     'narrativeqa' 'qasper' 'multifieldqa_en' # Single-Document QA':
      'hotpotqa' '2wikimqa' 'musique'  # 'Multi-Document QA'
      'gov_report' 'qmsum' 'multi_news' # 'Summarization'
      'trec' 'triviaqa' 'samsum'  #  'Few-shot Learning'
@@ -32,11 +32,11 @@ methods=(
 #    'llmlingua'
 #    'longllmlingua'
 
-#    'attn'  # last token attn only
-#     'attn-qa'  # all query token
-#    'ppl'  # ppl only
-#    'dac'  # attn + ppl
-#    'ehpc'  # select heads
+#    'attn'  
+#     'attn-qa' 
+#    'ppl'  
+#    'dac'  
+#    'ehpc'  
     'kvzip'
 
 #    'p-contrast'
@@ -95,35 +95,3 @@ for model in "${models[@]}"; do
         done
     done
 done
-
-
-# NOTE for dynamic  'rollout-contrast-qa'
-
-#rollout_ms=(1 2 3 0)
-#export CUDA_VISIBLE_DEVICES=3
-#
-#for m in "${rollout_ms[@]}"; do
-#    for bench in "${benches[@]}"; do
-#        if [ "$bench" = "longbench-e" ]; then
-#          datasets=("${datasets_longbench_e[@]}")
-#        else
-#          datasets=("${datasets_longbench[@]}")
-#        fi
-#
-#        for method in "${methods[@]}"; do
-#            for target in "${targets[@]}"; do
-#                for dataset in "${datasets[@]}"; do
-#
-#                    echo "method ${method} target ${target} dataset ${dataset}"
-#                    python compress.py \
-#                        --method "${method}" \
-#                        --target_token "${target}" \
-#                        --bench "${bench}" \
-#                        --dataset "${dataset}" \
-#                        --rollout_m ${m}
-#
-#                done
-#            done
-#        done
-#    done
-#done
